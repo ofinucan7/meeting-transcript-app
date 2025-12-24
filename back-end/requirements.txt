@@ -31,7 +31,6 @@ passlib==1.7.4
 pathlib==1.0.1
 psycopg==3.3.2
 psycopg-binary==3.3.2
-psycopg2-binary==2.9.9
 pyasn1==0.6.1
 pycparser==2.23
 pydantic==2.12.5
@@ -54,3 +53,4 @@ tzdata==2025.3
 uvicorn==0.38.0
 watchfiles==1.1.1
 websockets==15.0.1
+
