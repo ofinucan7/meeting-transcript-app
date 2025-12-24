@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env", override=True)
+load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env")
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
