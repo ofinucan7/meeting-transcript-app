@@ -16,7 +16,6 @@ function formatDateLabel(iso: string) {
 export default function Sidebar({
   open,
   onToggle,
-  currentUserEmail,
   workspaces,
   activeWorkspaceId,
   onChangeWorkspace,
@@ -33,8 +32,6 @@ export default function Sidebar({
 }: {
   open: boolean;
   onToggle: () => void;
-  currentUserEmail: string | null;
-
   workspaces: Workspace[];
   activeWorkspaceId: number | null;
   onChangeWorkspace: (id: number) => void;
