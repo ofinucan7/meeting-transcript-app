@@ -10,7 +10,11 @@ import type {
   ExtractedItem,
 } from "./types";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+const rawBase = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+const API_BASE =
+  rawBase.startsWith("http://") || rawBase.startsWith("https://")
+    ? rawBase
+    : `https://${rawBase}`;
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
