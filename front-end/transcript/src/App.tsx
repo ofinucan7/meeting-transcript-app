@@ -246,7 +246,6 @@ export default function App() {
 
         <Sidebar
           open={sidebarOpen}
-          currentUserEmail={user?.email ?? null}
           onToggle={() => setSidebarOpen((v) => !v)}
           workspaces={workspaces}
           activeWorkspaceId={activeWorkspaceId}
