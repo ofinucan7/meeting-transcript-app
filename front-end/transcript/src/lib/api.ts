@@ -51,6 +51,17 @@ export const api = {
 
   listItems: (meetingId: number) =>
     request<ExtractedItem[]>(`/meetings/${meetingId}/items`),
+  
+  listExtractionItems: (extractionId: number) =>
+  request<any[]>(`/extractions/${extractionId}/items`),
+
+patchExtractedItem: (itemId: number, patch: Partial<ExtractedItem> & { edit_reason?: string | null }) =>
+  request<ExtractedItem>(`/items/${itemId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  }),
+
 
   patchItem: (
     itemId: number,
