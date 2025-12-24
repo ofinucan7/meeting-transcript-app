@@ -37,53 +37,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
+  // --------------------
+  // Auth
+  // --------------------
   me: () => request<User>("/auth/me"),
-
-  startExtraction: (meetingId: number, model = "hf_structured") =>
-    request<Extraction>(`/meetings/${meetingId}/extract`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model }),
-    }),
-
-  listExtractions: (meetingId: number) =>
-    request<Extraction[]>(`/meetings/${meetingId}/extractions`),
-
-  listItems: (meetingId: number) =>
-    request<ExtractedItem[]>(`/meetings/${meetingId}/items`),
-  
-  listExtractionItems: (extractionId: number) =>
-  request<any[]>(`/extractions/${extractionId}/items`),
-
-patchExtractedItem: (itemId: number, patch: Partial<ExtractedItem> & { edit_reason?: string | null }) =>
-  request<ExtractedItem>(`/items/${itemId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(patch),
-  }),
-
-
-  patchItem: (
-    itemId: number,
-    patch: Partial<
-      Pick<
-        ExtractedItem,
-        | "title"
-        | "details"
-        | "speaker"
-        | "timestamp_start"
-        | "timestamp_end"
-        | "status"
-        | "needs_review"
-        | "review_reasons"
-      >
-    > & { edit_reason?: string }
-  ) =>
-    request<ExtractedItem>(`/items/${itemId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
-    }),
 
   signup: (email: string, password: string) =>
     request<User>("/auth/signup", {
@@ -101,6 +58,9 @@ patchExtractedItem: (itemId: number, patch: Partial<ExtractedItem> & { edit_reas
 
   logout: () => request<void>("/auth/logout", { method: "POST" }),
 
+  // --------------------
+  // Workspaces
+  // --------------------
   listWorkspaces: () => request<Workspace[]>("/workspaces"),
 
   createWorkspace: (name: string) =>
@@ -110,6 +70,23 @@ patchExtractedItem: (itemId: number, patch: Partial<ExtractedItem> & { edit_reas
       body: JSON.stringify({ name }),
     }),
 
+  listWorkspaceMembers: (workspaceId: number) =>
+    request<WorkspaceMember[]>(`/workspaces/${workspaceId}/members`),
+
+  updateWorkspaceMember: (
+    workspaceId: number,
+    memberId: number,
+    display_name: string | null
+  ) =>
+    request<WorkspaceMember>(`/workspaces/${workspaceId}/members/${memberId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ display_name }),
+    }),
+
+  // --------------------
+  // Meetings + transcripts
+  // --------------------
   listMeetings: (workspaceId: number) =>
     request<Meeting[]>(`/meetings?workspace_id=${workspaceId}`),
 
@@ -148,6 +125,37 @@ patchExtractedItem: (itemId: number, patch: Partial<ExtractedItem> & { edit_reas
     return res.json() as Promise<TranscriptVersion>;
   },
 
+  // --------------------
+  // Extractions + items
+  // --------------------
+  startExtraction: (meetingId: number, model = "hf_structured") =>
+    request<Extraction>(`/meetings/${meetingId}/extract`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model }),
+    }),
+
+  listExtractions: (meetingId: number) =>
+    request<Extraction[]>(`/meetings/${meetingId}/extractions`),
+
+  // If your backend supports /extractions/:id/items (recommended)
+  listExtractionItems: (extractionId: number) =>
+    request<ExtractedItem[]>(`/extractions/${extractionId}/items`),
+
+  // Patch a single extracted item (approve/reject/edit)
+  patchExtractedItem: (
+    itemId: number,
+    patch: Partial<ExtractedItem> & { edit_reason?: string | null }
+  ) =>
+    request<ExtractedItem>(`/items/${itemId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }),
+
+  // --------------------
+  // Tasks
+  // --------------------
   listTasks: (
     workspaceId: number,
     opts?: { assignee_display_name?: string }
@@ -179,28 +187,11 @@ patchExtractedItem: (itemId: number, patch: Partial<ExtractedItem> & { edit_reas
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patch),
     }),
-    patchExtractedItem: (
-  itemId: number,
-  patch: Partial<{
-    status: "pending" | "approved" | "rejected";
-    title: string;
-    details: string | null;
-    speaker: string | null;
-    timestamp_start: number | null;
-    timestamp_end: number | null;
-    needs_review: boolean;
-    review_reasons: string[] | null;
-    edit_reason: string | null;
-  }>
-) =>
-  request<ExtractedItem>(`/items/${itemId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(patch),
-  }),
 
+  // --------------------
+  // Invites
+  // --------------------
   listPendingInvites: () => request<Invite[]>("/invites/pending"),
-  
 
   createInvite: (workspace_id: number, email: string) =>
     request<Invite>("/invites", {
@@ -214,20 +205,4 @@ patchExtractedItem: (itemId: number, patch: Partial<ExtractedItem> & { edit_reas
 
   declineInvite: (inviteId: number) =>
     request<void>(`/invites/${inviteId}/decline`, { method: "POST" }),
-
-  listWorkspaceMembers: (workspaceId: number) =>
-    request<WorkspaceMember[]>(`/workspaces/${workspaceId}/members`),
-
-  updateWorkspaceMember: (
-    workspaceId: number,
-    memberId: number,
-    display_name: string | null
-  ) =>
-    request<WorkspaceMember>(`/workspaces/${workspaceId}/members/${memberId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ display_name }),
-    }),
-
-
 };
